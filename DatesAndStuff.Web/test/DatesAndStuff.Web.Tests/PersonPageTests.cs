@@ -33,8 +33,8 @@ public class PersonPageTests
         var startInfo = new ProcessStartInfo
         {
             FileName = "dotnet",
-            //Arguments = $"run --project \"{webProjectPath}\"",
-            Arguments = "dotnet run --no-build",
+            Arguments = $"run --project \"{webProjectPath}\"",
+            // Arguments = "dotnet run --no-build",
             WorkingDirectory = webProjFolderPath,
             RedirectStandardOutput = true,
             RedirectStandardError = true,
@@ -78,7 +78,10 @@ public class PersonPageTests
     [SetUp]
     public void SetupTest()
     {
-        driver = new ChromeDriver();
+        var options = new ChromeOptions();
+        options.BinaryLocation = "/home/leswellhm/.nix-profile/bin/chromium";
+       
+        driver = new ChromeDriver(options);
         verificationErrors = new StringBuilder();
     }
 
