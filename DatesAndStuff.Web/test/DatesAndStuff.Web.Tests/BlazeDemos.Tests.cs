@@ -50,8 +50,34 @@ namespace DatesAndStuff.Web.Tests
             driver.FindElement(By.XPath("//input[@value='Find Flights']")).Click();
             
             var rows = driver.FindElements(By.XPath("//table/tbody/tr"));
+
+            const double priceThreshold = 210.0;
+            var priceCells = driver.FindElements(By.XPath("//table/tbody/tr/td[6]"));
+            var values = priceCells
+                .Select(c => ParseMoney(c.Text))
+                .ToList();
+            
+            
+            if (values.Any(v => v < priceThreshold))
+            {
+                var home = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
+                var path = Path.Combine(home, "verval.png");
+                
+                var screenshot = ((ITakesScreenshot)driver).GetScreenshot();
+                screenshot.SaveAsFile(path);
+            }
+
             rows.Count.Should().BeGreaterThanOrEqualTo(3);
         }
+        
+        private double ParseMoney(string value)
+        {
+            return double.Parse(
+                value.Replace("$", "").Trim(),
+                System.Globalization.CultureInfo.InvariantCulture
+            );
+        }
+        
         private bool IsElementPresent(By by)
         {
             try
