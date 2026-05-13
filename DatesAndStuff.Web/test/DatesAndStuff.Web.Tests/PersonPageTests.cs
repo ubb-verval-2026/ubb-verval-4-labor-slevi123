@@ -127,6 +127,33 @@ public class PersonPageTests
         var expectedSalary = 5000 * (1.0 + double.Parse(percentage) / 100.0);
         salaryAfterSubmission.Should().BeApproximately(expectedSalary, 0.001);
     }
+
+    [Test]
+    public void Person_SalaryDecreaseBelowTenPercent_ShouldDisplayErrorMessages()
+    {
+        const String percentage = "-11";
+        
+        // Arrange
+        driver.Navigate().GoToUrl(BaseURL);
+        driver.FindElement(By.XPath("//*[@data-test='PersonPageNavigation']")).Click();
+
+        var wait = new WebDriverWait(driver, TimeSpan.FromSeconds(5));
+
+        Thread.Sleep(1000);
+        var input = wait.Until(ExpectedConditions.ElementExists(By.XPath("//*[@data-test='SalaryIncreasePercentageInput']")));
+        input.Clear();
+        input.SendKeys(percentage);
+
+        // Act
+        var submitButton = wait.Until(ExpectedConditions.ElementExists(By.XPath("//*[@data-test='SalaryIncreaseSubmitButton']")));
+        submitButton.Click();
+        Thread.Sleep(2000);
+
+        // Assert
+        IsElementPresent(By.XPath("//ul[@class='validation-errors']/li")).Should().BeTrue();
+        IsElementPresent(By.XPath("//div[contains(@class, 'form-group')]/div/div[@class='validation-message']")).Should().BeTrue();
+    }
+    
     private bool IsElementPresent(By by)
     {
         try
