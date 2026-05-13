@@ -106,14 +106,14 @@ public class PersonTests
     }
 
     [Test]
-    public void IncreaseSalary_MinusTenPerc_ShouldFail()
+    public void IncreaseSalary_SmallerThenMinusTenPerc_ShouldFail()
     { 
         // Arrange
         Person sut = PersonFactory.CreateTestPerson(fp => fp.CanEatChocolate = false);
         double initialSalary = sut.Salary;
 
         // Act
-        Action act = () => sut.IncreaseSalary(-10);
+        Action act = () => sut.IncreaseSalary(-10.1);
 
         // Assert
         act.Should().Throw<ArgumentOutOfRangeException>();
