@@ -78,10 +78,10 @@ public class PersonPageTests
     [SetUp]
     public void SetupTest()
     {
-        var options = new ChromeOptions();
-        options.BinaryLocation = "/home/leswellhm/.nix-profile/bin/chromium";
+        // var options = new ChromeOptions();
+        // options.BinaryLocation = "/home/leswellhm/.nix-profile/bin/chromium";
        
-        driver = new ChromeDriver(options);
+        driver = new ChromeDriver();
         verificationErrors = new StringBuilder();
     }
 
@@ -100,8 +100,10 @@ public class PersonPageTests
         Assert.That(verificationErrors.ToString(), Is.EqualTo(""));
     }
 
-    [Test]
-    public void Person_SalaryIncrease_ShouldIncrease()
+    [TestCase("5")]
+    [TestCase("15")]
+    [TestCase("55")]
+    public void Person_SalaryIncrease_ShouldIncrease(String percentage)
     {
         // Arrange
         driver.Navigate().GoToUrl(BaseURL);
@@ -109,19 +111,21 @@ public class PersonPageTests
 
         var wait = new WebDriverWait(driver, TimeSpan.FromSeconds(5));
 
+        Thread.Sleep(1000);
         var input = wait.Until(ExpectedConditions.ElementExists(By.XPath("//*[@data-test='SalaryIncreasePercentageInput']")));
         input.Clear();
-        input.SendKeys("5");
+        input.SendKeys(percentage);
 
         // Act
         var submitButton = wait.Until(ExpectedConditions.ElementExists(By.XPath("//*[@data-test='SalaryIncreaseSubmitButton']")));
         submitButton.Click();
-
+        Thread.Sleep(2000);
 
         // Assert
         var salaryLabel = wait.Until(ExpectedConditions.ElementExists(By.XPath("//*[@data-test='DisplayedSalary']")));
         var salaryAfterSubmission = double.Parse(salaryLabel.Text);
-        salaryAfterSubmission.Should().BeApproximately(5250, 0.001);
+        var expectedSalary = 5000 * (1.0 + double.Parse(percentage) / 100.0);
+        salaryAfterSubmission.Should().BeApproximately(expectedSalary, 0.001);
     }
     private bool IsElementPresent(By by)
     {
